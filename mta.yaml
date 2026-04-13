@@ -1,0 +1,163 @@
+_schema-version: 3.3.0
+ID: Z_BID_MATRIX
+version: 1.0.0
+description: "A simple CAP project."
+parameters:
+  enable-parallel-deployments: true
+  deploy_mode: html5-repo
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci
+        - npx cds build --production
+modules:
+  - name: Z_BID_MATRIX-srv
+    type: nodejs
+    path: gen/srv
+    parameters:
+      instances: 1
+      buildpack: nodejs_buildpack
+    build-parameters:
+      builder: npm-ci
+    provides:
+      - name: srv-api # required by consumers of CAP services (e.g. approuter)
+        properties:
+          srv-url: ${default-url}
+    requires:
+      - name: Z_BID_MATRIX-auth
+      - name: Z_BID_MATRIX-db
+      - name: Z_BID_MATRIX-postgres
+      - name: Z_BID_MATRIX-connectivity
+      - name: Z_BID_MATRIX-destination
+
+  - name: Z_BID_MATRIX-db-deployer
+    type: hdb
+    path: gen/db
+    parameters:
+      buildpack: nodejs_buildpack
+    requires:
+      - name: Z_BID_MATRIX-db
+
+  - name: Z_BID_MATRIX-postgres-deployer
+    type: nodejs
+    path: gen/pg
+    parameters:
+      buildpack: nodejs_buildpack
+      no-route: true
+      no-start: true
+      tasks:
+        - name: deploy-to-postgresql
+          command: npm start
+    requires:
+      - name: Z_BID_MATRIX-postgres
+  - name: Z_BID_MATRIX
+    type: approuter.nodejs
+    path: app/router
+    parameters:
+      keep-existing-routes: true
+      disk-quota: 256M
+      memory: 256M
+    requires:
+      - name: srv-api
+        group: destinations
+        properties:
+          name: srv-api # must be used in xs-app.json as well
+          url: ~{srv-url}
+          forwardAuthToken: true
+      - name: Z_BID_MATRIX-auth
+      - name: Z_BID_MATRIX-destination
+      - name: Z_BID_MATRIX-html5-runtime
+      - name: Z_BID_MATRIX-portal
+    provides:
+      - name: app-api
+        properties:
+          app-protocol: ${protocol}
+          app-uri: ${default-uri}
+
+  - name: Z_BID_MATRIX-app-deployer
+    type: com.sap.application.content
+    path: gen
+    requires:
+      - name: Z_BID_MATRIX-auth
+      - name: srv-api
+      - name: Z_BID_MATRIX-html5-repo-host
+        parameters:
+          content-target: true
+          config:
+            HTML5Runtime_enabled: true
+    build-parameters:
+      build-result: app/
+      requires:
+
+
+  - name: Z_BID_MATRIX-portal-deployer
+    type: com.sap.application.content
+    path: app/portal
+    requires:
+      - name: Z_BID_MATRIX-portal
+        parameters:
+          content-target: true
+          service-key:
+            name: Z_BID_MATRIX-portal-key
+            config:
+              content-endpoint: developer
+      - name: Z_BID_MATRIX-auth
+      - name: Z_BID_MATRIX-html5-repo-host
+      - name: Z_BID_MATRIX-app-deployer
+    deployed-after:
+      - Z_BID_MATRIX-app-deployer
+resources:
+  - name: Z_BID_MATRIX-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: Z_BID_MATRIX-${org}-${space}
+        tenant-mode: dedicated
+        oauth2-configuration:
+          credential-types:
+            - "binding-secret"
+            - "x509"
+          redirect-uris:
+            - https://*~{app-api/app-uri}/**
+    requires:
+      - name: app-api
+  - name: Z_BID_MATRIX-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+  - name: Z_BID_MATRIX-postgres
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: postgresql-db
+      service-plan: development
+  - name: Z_BID_MATRIX-connectivity
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: connectivity
+      service-plan: lite
+  - name: Z_BID_MATRIX-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
+
+  - name: Z_BID_MATRIX-html5-repo-host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-host
+  - name: Z_BID_MATRIX-html5-runtime
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-runtime
+  - name: Z_BID_MATRIX-portal
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: portal
+      service-plan: standard

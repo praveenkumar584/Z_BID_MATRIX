@@ -1,0 +1,10 @@
+{
+  "destinations": [
+    {
+      "name": "ARIBA_API_Consumption",
+      "url": "https://eu.developer.ariba.com/api",
+      "username": "MIND_FIORI",
+      "password": "Motherson@2026"
+    }
+  ]
+}
