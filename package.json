@@ -22,6 +22,9 @@
       "[production]": {
         "auth": "xsuaa"
       },
+      "destination": {
+        "kind": "destinations"
+      },
       "connectivity": true,
       "destinations": true,
       "html5-repo": true,

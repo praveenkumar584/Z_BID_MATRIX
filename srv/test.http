@@ -1,1 +1,6 @@
-GEt http://localhost:4004/odata/v4/api-service-consumption/getAribaData
+GET http://localhost:4004/odata/v4/api-service-consumption/getAribaData
+Content-Type: application/json
+
+{
+  "eventId": "Doc2923397525"
+}

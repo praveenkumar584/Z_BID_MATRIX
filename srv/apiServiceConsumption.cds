@@ -1,4 +1,4 @@
 service apiServiceConsumption
 {
-  function getAribaData() returns String;
+  function getAribaData(eventId: String) returns String;
 }
