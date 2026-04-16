@@ -13,8 +13,9 @@ module.exports = cds.service.impl(function ()
 
       const destConfig = dest?.originalProperties ?? {};
       const apiKey = destConfig.destinationConfiguration['URL.queries.apiKey'];
-      const baseURL = destConfig.destinationConfiguration['URL'] || dest?.url;
-      const token = dest?.authTokens?.[0]?.value;
+
+      //const baseURL = destConfig.destinationConfiguration['URL'] || dest?.url;
+      //const token = dest?.authTokens?.[0]?.value;
 
       //console.log("Base URL:", baseURL);
       // console.log("apiKey:", apiKey);
@@ -50,8 +51,6 @@ module.exports = cds.service.impl(function ()
     catch (error)
     {
       console.error("Message:", error.message);
-      console.error("Outgoing URL:", error?.config?.url);
-      console.error("Outgoing baseURL:", error?.config?.baseURL);
       console.error("Outgoing headers:", JSON.stringify(error?.config?.headers));
       console.error("Response data:", JSON.stringify(error?.response?.data));
       req.error(500, error?.response?.data?.message || error.message);
