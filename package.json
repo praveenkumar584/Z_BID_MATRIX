@@ -7,17 +7,25 @@
     "@sap-cloud-sdk/http-client": "^4.5.1",
     "@sap/cds": "^9",
     "@sap/xsenv": "^6.2.0",
-    "@sap/xssec": "^4"
+    "@sap/xssec": "^4",
+    "exceljs": "^4.4.0"
   },
   "devDependencies": {
     "@cap-js/sqlite": "^2",
-    "@sap/cds-dk": "^9"
+    "@sap/cds-dk": "^9",
+    "cds-plugin-ui5": "^0.13.0",
+    "mbt": "^1.2.29",
+    "rimraf": "^5.0.5"
   },
   "overrides": {
     "axios": "1.15.0"
   },
   "scripts": {
-    "start": "cds-serve"
+    "start": "cds-serve",
+    "watch-zbidmatrixapp": "cds watch --open zbidmatrixapp/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "undeploy": "cf undeploy Z_BID_MATRIX --delete-services --delete-service-keys --delete-service-brokers",
+    "build": "rimraf resources mta_archives && mbt build --mtar archive",
+    "deploy": "cf deploy mta_archives/archive.mtar --retries 1"
   },
   "private": true,
   "cds": {
@@ -33,5 +41,8 @@
       "html5-repo": true,
       "portal": true
     }
-  }
+  },
+  "workspaces": [
+    "app/*"
+  ]
 }

@@ -9,6 +9,13 @@
       "cwd": "${workspaceFolder}"
     },
     {
+      "command": "cds watch --profile hybrid",
+      "name": "TESTDebugger",
+      "request": "launch",
+      "type": "node-terminal",
+      "cwd": "${workspaceFolder}"
+    },
+    {
       "name": "Run Z_BID_MATRIX-1",
       "request": "launch",
       "type": "node",
