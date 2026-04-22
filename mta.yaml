@@ -1,182 +1,44 @@
-_schema-version: 3.3.0
+_schema-version: "3.1"
 ID: Z_BID_MATRIX
-description: A simple CAP project.
 version: 1.0.0
+
 modules:
-- name: Z_BID_MATRIX-srv
-  type: nodejs
-  path: gen/srv
-  requires:
-  - name: Z_BID_MATRIX-auth
-  - name: Z_BID_MATRIX-db
-  - name: Z_BID_MATRIX-postgres
-  - name: Z_BID_MATRIX-connectivity
-  - name: Z_BID_MATRIX-destination
-  provides:
-  - name: srv-api
-    properties:
-      srv-url: ${default-url}
-  parameters:
-    buildpack: nodejs_buildpack
-    instances: 1
-  build-parameters:
-    builder: npm-ci
-- name: Z_BID_MATRIX-db-deployer
-  type: hdb
-  path: gen/db
-  requires:
-  - name: Z_BID_MATRIX-db
-  parameters:
-    buildpack: nodejs_buildpack
-- name: Z_BID_MATRIX-postgres-deployer
-  type: nodejs
-  path: gen/pg
-  requires:
-  - name: Z_BID_MATRIX-postgres
-  parameters:
-    buildpack: nodejs_buildpack
-    no-route: true
-    no-start: true
-    tasks:
-    - command: npm start
-      name: deploy-to-postgresql
-- name: Z_BID_MATRIX
-  type: approuter.nodejs
-  path: app/router
-  requires:
-  - name: srv-api
-    group: destinations
-    properties:
-      forwardAuthToken: true
-      name: srv-api
-      url: ~{srv-url}
-  - name: Z_BID_MATRIX-auth
-  - name: Z_BID_MATRIX-destination
-  - name: Z_BID_MATRIX-html5-runtime
-  - name: Z_BID_MATRIX-portal
-  provides:
-  - name: app-api
-    properties:
-      app-protocol: ${protocol}
-      app-uri: ${default-uri}
-  parameters:
-    disk-quota: 256M
-    keep-existing-routes: true
-    memory: 256M
-- name: Z_BID_MATRIX-app-deployer
-  type: com.sap.application.content
-  path: gen
-  requires:
-  - name: Z_BID_MATRIX-auth
-  - name: srv-api
-  - name: Z_BID_MATRIX-html5-repo-host
+
+  - name: Z_BID_MATRIX-srv
+    type: nodejs
+    path: gen/srv
     parameters:
-      config:
-        HTML5Runtime_enabled: true
-      content-target: true
-  build-parameters:
-    build-result: app/
+      memory: 256M
+    provides:
+      - name: srv-api
+        properties:
+          url: ${default-url}
+    build-parameters:
+      builder: npm-ci
+
+  - name: zbidmatrixapp
+    type: html5
+    path: app/zbidmatrixapp
+    parameters:
+      memory: 128M
+    build-parameters:
+      builder: custom
+      commands:
+        - npm install
+        - npm run build
     requires:
-    - artifacts:
-      - zbidmatrixapp.zip
-      name: zbidmatrixapp
-      target-path: app/
-- name: Z_BID_MATRIX-portal-deployer
-  type: com.sap.application.content
-  path: app/portal
-  requires:
-  - name: Z_BID_MATRIX-portal
-    parameters:
-      content-target: true
-      service-key:
-        config:
-          content-endpoint: developer
-        name: Z_BID_MATRIX-portal-key
-  - name: Z_BID_MATRIX-auth
-  - name: Z_BID_MATRIX-html5-repo-host
-  - name: Z_BID_MATRIX-app-deployer
-  deployed-after:
-  - Z_BID_MATRIX-app-deployer
-- name: zbidmatrixapp
-  type: html5
-  path: app/zbidmatrixapp
-  build-parameters:
-    build-result: dist
-    builder: custom
-    commands:
-    - npm install
-    - npm run build:cf
-    supported-platforms: []
-resources:
-- name: Z_BID_MATRIX-auth
-  type: org.cloudfoundry.managed-service
-  parameters:
-    config:
-      oauth2-configuration:
-        credential-types:
-        - binding-secret
-        - x509
-        redirect-uris:
-        - https://*~{app-api/app-uri}/**
-      tenant-mode: dedicated
-      xsappname: Z_BID_MATRIX-${org}-${space}
-    path: ./xs-security.json
-    service: xsuaa
-    service-plan: application
-  requires:
-  - name: app-api
-- name: Z_BID_MATRIX-db
-  type: com.sap.xs.hdi-container
-  parameters:
-    service: hana
-    service-plan: hdi-shared
-- name: Z_BID_MATRIX-postgres
-  type: org.cloudfoundry.managed-service
-  parameters:
-    service: postgresql-db
-    service-plan: development
-- name: Z_BID_MATRIX-connectivity
-  type: org.cloudfoundry.managed-service
-  parameters:
-    service: connectivity
-    service-plan: lite
-- name: Z_BID_MATRIX-destination
-  type: org.cloudfoundry.managed-service
-  parameters:
-    config:
-      HTML5Runtime_enabled: false
-      init_data:
-        instance:
-          destinations:
-          - Authentication: NoAuthentication
-            Name: ui5
-            ProxyType: Internet
-            Type: HTTP
-            URL: https://ui5.sap.com
-          existing_destinations_policy: update
-    service: destination
-    service-plan: lite
-- name: Z_BID_MATRIX-html5-repo-host
-  type: org.cloudfoundry.managed-service
-  parameters:
-    service: html5-apps-repo
-    service-plan: app-host
-- name: Z_BID_MATRIX-html5-runtime
-  type: org.cloudfoundry.managed-service
-  parameters:
-    service: html5-apps-repo
-    service-plan: app-runtime
-- name: Z_BID_MATRIX-portal
-  type: org.cloudfoundry.managed-service
-  parameters:
-    service: portal
-    service-plan: standard
-parameters:
-  deploy_mode: html5-repo
-  enable-parallel-deployments: true
+      - name: srv-api
+        group: destinations
+        properties:
+          name: srv-api
+          url: ~{url}
+          forwardAuthToken: false
+
+resources: []
+
 build-parameters:
   before-all:
-  - builder: custom
-    commands:
-    - npm ci
-    - npx cds build --production
+    - builder: custom
+      commands:
+        - npm ci
+        - npx cds build --production
