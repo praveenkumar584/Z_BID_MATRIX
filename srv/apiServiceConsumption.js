@@ -57,9 +57,11 @@ module.exports = cds.service.impl(function () {
         worksheet.getCell(`${col}14`).value = address.phone || '';
         worksheet.getCell(`${col}15`).value = mainContact.emailAddress || '';
         worksheet.getCell(`${col}16`).value = item.invitationId || '';
-        worksheet.getCell(`${col}19`).value = address.country || '';
+        worksheet.getCell(`${col}19`).value = 'DENMARK' || '';
+        //worksheet.getCell(`${col}19`).value = address.country || '';
         worksheet.getCell(`${col}22`).value = item.registrationStatus || '';
       });
+      workbook.calcProperties.fullCalcOnLoad = true;
       const buffer = await workbook.xlsx.writeBuffer();
       return Buffer.from(buffer).toString('base64');
     }

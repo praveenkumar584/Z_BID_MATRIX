@@ -1,6 +1,7 @@
 sap.ui.define([
-    "zbidmatrixapp/Helpers/logoHelper"
-], (logoHelper) => {
+    "zbidmatrixapp/Helpers/logoHelper",
+    "zbidmatrixapp/Helpers/backgroundColourHelper"
+], (logoHelper,backgroundColourHelper) => {
     "use strict";
     return {
         renderSheet(oController, sheetName)
@@ -91,17 +92,10 @@ sap.ui.define([
                     {
                         const s = cell.s;
                         console.log(cell.s);
-                        if (s.fgColor?.rgb && s.fgColor.rgb !== "FFFFFF00")
+                        const bgColor = backgroundColourHelper.getBackgroundColor(s);
+                        if (bgColor)
                         {
-                            style += `background-color:#${s.fgColor.rgb};`;
-                        }
-                        if (s.fgColor?.rgb && s.fgColor.rgb === "#a6a6a6")
-                        {
-                            style += `background-color:${s.fgColor.rgb};`;
-                        }
-                        if (s.bgColor?.rgb && s.bgColor.rgb !== "FFFFFF00")
-                        {
-                            style += `background-color:#${s.bgColor.rgb};`;
+                            style += `background-color:${bgColor};`;
                         }
                         if (s.font)
                         {
