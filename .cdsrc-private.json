@@ -1,0 +1,38 @@
+{
+  "[hybrid]": {
+    "requires": {
+      "destination": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.eu10-004.hana.ondemand.com",
+          "org": "MOTHERSON TECHNOLOGY SERVICES LIMITED_mtsldev-ui5-qy00baqd",
+          "space": "MTSL_DEV",
+          "instance": "destination-srv",
+          "key": "destination-srv-key"
+        },
+        "kind": "destinations",
+        "vcap": {
+          "name": "destination"
+        }
+      }
+    }
+  },
+  "requires": {
+    "[hybrid]": {
+      "destination": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.eu10-004.hana.ondemand.com",
+          "org": "MOTHERSON TECHNOLOGY SERVICES LIMITED_mtsldev-ui5-qy00baqd",
+          "space": "MTSL_DEV",
+          "instance": "destination-srv",
+          "key": "destination-srv-key"
+        },
+        "kind": "destinations",
+        "vcap": {
+          "name": "destination"
+        }
+      }
+    }
+  }
+}

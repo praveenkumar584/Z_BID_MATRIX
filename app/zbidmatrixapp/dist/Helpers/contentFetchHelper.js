@@ -1,2 +1,0 @@
-sap.ui.define([],()=>{"use strict";return{async fetchBase64(){const t=await fetch("/odata/v4/api-service-consumption/getTemplateFile",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({eventId:"Doc2923397525"})});if(!t.ok){throw new Error("HTTP "+t.status)}const e=await t.json();const n=e.value??e;if(!n){throw new Error("Empty response")}return n}}});
-//# sourceMappingURL=contentFetchHelper.js.map

@@ -1,3 +1,28 @@
-
 # added by cds
-.cdsrc-private.json
+# Node dependencies
+node_modules/
+
+# Logs
+*.log
+
+# Environment files
+.env
+
+# Build / deployment artifacts
+dist/
+build/
+gen/
+mta_archives/
+*.mtar
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# CAP specific (optional based on your need)
+cds-services.json
+
+# UI5 build (if applicable)
+webapp/dist/

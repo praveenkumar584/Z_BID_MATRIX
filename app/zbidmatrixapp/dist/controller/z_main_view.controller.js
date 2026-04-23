@@ -1,2 +1,0 @@
-sap.ui.define(["sap/ui/core/mvc/Controller","zbidmatrixapp/Helpers/previewHelper","zbidmatrixapp/Helpers/contentFetchHelper","zbidmatrixapp/Helpers/tabContentHelper","zbidmatrixapp/Helpers/contentRenderHelper"],(e,t,r,i,p)=>{"use strict";return e.extend("zbidmatrixapp.controller.z_main_view",{workbook:null,zoomLevel:1,onInit(){t.previewTemplate(this)},onPreview(){t.previewTemplate(this)},fetchBase64Data(){return r.fetchBase64()},buildSingleTabView(e){i.buildSingleTab(this,e)},renderSheetContent(e){p.renderSheet(this,e)}})});
-//# sourceMappingURL=z_main_view.controller.js.map
